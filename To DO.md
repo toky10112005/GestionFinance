@@ -12,8 +12,12 @@
         1. input dans React(avec validation des données saisis).  Toky  
         2. Envoie des données vers Spring.  Toky
         3. Validation des données dans Spring.  Toky
-        4. Enregistrement des données dans la base de données.
-        5.Redirection vers la page d'affichage de budget.
+        4. Creation d'une page pour l'inscription. Rova
+        5. Validation et sauvegarde des donnees dans Spring. Rova
+        6. Enregistrement des données dans la base de données. Rova
+        7. Redirection vers la page principale. Rova
+        8. Validation des formulaire cote back. 
+        9. CSS.
 
     C.Input de Budget:
 

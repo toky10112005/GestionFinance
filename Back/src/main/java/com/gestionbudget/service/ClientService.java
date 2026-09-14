@@ -24,5 +24,9 @@ public class ClientService {
     public Client findByUsername(String username) {
         return clientRepository.findByUsername(username);
     }
+
+    public void saveClient(Client client) {
+        clientRepository.save(client);
+    }
     
 }

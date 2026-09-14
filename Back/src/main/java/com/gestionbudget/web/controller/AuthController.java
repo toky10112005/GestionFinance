@@ -34,4 +34,13 @@ public class AuthController {
 
         return ResponseEntity.status(401).body("Nom d'utilisateur ou mot de passe incorrect");
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Client client) {
+        if (clientService.findByUsername(client.getUsername()) != null) {
+            return ResponseEntity.status(400).body("Nom d'utilisateur déjà utilisé");
+        }
+        clientService.saveClient(client);
+        return ResponseEntity.ok("Client enregistré avec succès");
+    }
 }
