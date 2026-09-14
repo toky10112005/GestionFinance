@@ -6,17 +6,21 @@ import com.gestionbudget.dto.LoginRequest;
 import com.gestionbudget.dto.LoginResponse;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    final private PasswordEncoder passwordEncoder;
     final private ClientService clientService;
 
-    public AuthController(ClientService clientService) {
+    public AuthController(ClientService clientService, PasswordEncoder passwordEncoder) {
         this.clientService = clientService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")
@@ -25,7 +29,7 @@ public class AuthController {
         String password = loginRequest.getPassword();
 
         Client user = clientService.findByUsername(username);
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             // TODO: générer un vrai JWT
             String fakeToken = "token-genere-exemple";
             LoginResponse response = new LoginResponse(fakeToken, username);

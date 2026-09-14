@@ -18,7 +18,7 @@ public class Client {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -26,4 +26,8 @@ public class Client {
 
     @Column(name = "role", nullable = false)
     private String role;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

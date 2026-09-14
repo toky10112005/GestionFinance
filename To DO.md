@@ -18,6 +18,7 @@
         7. Redirection vers la page principale. Rova
         8. Validation des formulaire cote back. 
         9. CSS.
+        10.Hashage de mot de passe. Toky
 
     C.Input de Budget:
 
