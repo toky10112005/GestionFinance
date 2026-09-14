@@ -3,3 +3,5 @@
 
 # Nasiko message d'erreur le login de redirection makany am'page home
 
+# Mamerena mampiditra base fa nasiko hash ilay mot de passe.
+
