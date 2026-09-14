@@ -38,11 +38,12 @@ export default function Login(){
         <div className="login">
             <h1>Veuiller vous connecter</h1>
             <form onSubmit={soumission(username, password)}>
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Nom d'utilisateur" />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mot de passe" />
-                <button type="submit">Se connecter</button>
+                <p>Nom d'utilisateur: 
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="vody" /></p>
+                <p>Mot de passe:
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="vody" /></p>
+                <p><button type="submit">Se connecter</button></p>
             </form>
-
         </div>
     );
 } 
