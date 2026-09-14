@@ -15,7 +15,7 @@ function soumission(username: string, password: string, setErreur: (erreur: stri
             });
 
             if(!response.ok){
-                setErreur("Erreur lors de la connexion");
+                setErreur("Erreur lors de la connexion: username ou mot de passe incorrect");
                 throw new Error("Erreur lors de la soumission du formulaire");
             }
             const data= await response.json();
@@ -43,9 +43,9 @@ export default function Login(){
             <h1>Veuiller vous connecter</h1>
             <form onSubmit={soumission(username, password, setErreur)}>
                 <p>Nom d'utilisateur: 
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="vody" /></p>
+                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="vody" required /></p>
                 <p>Mot de passe:
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="vody" /></p>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="vody" required /></p>
                 <p><button type="submit">Se connecter</button></p>
                 {erreur!=="" && <p className="error">{erreur}</p>}
             </form>
