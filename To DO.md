@@ -20,8 +20,16 @@
         9. CSS.
         10.Hashage de mot de passe. Toky
 
-    C.Input de Budget:
+    C.Input de Budget: En cours
+    Ao @page home no miasa
+        1.Création Input pour saisir le budget.
+    <!-- on considérera que le budget servira jusqu'à la fin du mois -->
+        2.Enregister dans la base
+        3.Affichage du budget saisis dans home
+        4.Possibilité de chager le budget saisis
 
-    D.Affichage de Budget.
+    D.Affichage des budgets:
+        1.Création des input pour permettre à l'utilisateur de saisir le budget de chaque catégorie.
+
 
 # Implémentation ds fonctionnalité Tiers: 
