@@ -8,19 +8,24 @@ CREATE TABLE IF NOT EXISTS "client"(
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS "categorieList"(
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-CREATE TABLE categorie (
+
+CREATE TABLE "categorie" (
     id SERIAL PRIMARY KEY,
     client_id INT NOT NULL REFERENCES client(id) ON DELETE CASCADE,
-    name VARCHAR(100) NOT NULL,
+    cetegorieList_id VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    UNIQUE(client_id, name)   -- Un client ne peut pas avoir deux catégories avec le même nom
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Budget du mois 
-CREATE TABLE budget (
+CREATE TABLE "budget" (
     id SERIAL PRIMARY KEY,
     client_id INT NOT NULL REFERENCES client(id) ON DELETE CASCADE,
     month INT NOT NULL CHECK (month BETWEEN 1 AND 12),
@@ -31,7 +36,7 @@ CREATE TABLE budget (
     UNIQUE(client_id, month)   -- Un seul budget par mois et par client
 );
 
-CREATE TABLE budget_categorie (
+CREATE TABLE "budget_categorie" (
     id SERIAL PRIMARY KEY,
     budget_id INT NOT NULL REFERENCES budget(id) ON DELETE CASCADE,
     categorie_id INT NOT NULL REFERENCES categorie(id) ON DELETE CASCADE,

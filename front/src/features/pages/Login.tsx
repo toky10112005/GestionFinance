@@ -23,6 +23,12 @@ function soumission(username: string, password: string, setErreur: (erreur: stri
              if (data.token) {
                 localStorage.setItem("token", data.token);
             }
+            
+            if(data.userID){
+                localStorage.setItem("userID", data.userID);
+            }
+            
+            console.log("userID:", data.userID);
             navigate("/home");
             setErreur("");
 

@@ -19,14 +19,16 @@
         8. Validation des formulaire cote back. 
         9. CSS.
         10.Hashage de mot de passe. Toky
+        11.Stocker en Session l'ID de l'utilisateur connecté. Toky
+        12.Mila amboarine le fangalana an ilay mois rehefa mampiditra budget(mila maka an ilay mois courant)
 
     C.Input de Budget: En cours
     Ao @page home no miasa
-        1.Création Input pour saisir le budget.
+        1.Création Input pour saisir le budget.Toky
     <!-- on considérera que le budget servira jusqu'à la fin du mois -->
         2.Enregister dans la base
         3.Affichage du budget saisis dans home
-        4.Possibilité de chager le budget saisis
+        4.Possibilité de changer le budget saisis
 
     D.Affichage des budgets:
         1.Création des input pour permettre à l'utilisateur de saisir le budget de chaque catégorie.

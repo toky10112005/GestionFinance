@@ -29,10 +29,13 @@ public class AuthController {
         String password = loginRequest.getPassword();
 
         Client user = clientService.findByUsername(username);
+       
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             // TODO: générer un vrai JWT
             String fakeToken = "token-genere-exemple";
-            LoginResponse response = new LoginResponse(fakeToken, username);
+            Long userID =user.getId();
+            LoginResponse response = new LoginResponse(fakeToken, username,userID);
+            
             return ResponseEntity.ok(response);
         }
 

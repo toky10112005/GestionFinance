@@ -5,3 +5,5 @@
 
 # Mamerena mampiditra base fa nasiko hash ilay mot de passe.
 
+# Efa afaka mampiditra Budget(budget du mois).D tokony hoe rehefa avy mampiditra an ilay izy d mipoitra eo ambany eo ny input de categorie.
+
