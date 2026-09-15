@@ -4,11 +4,13 @@ public class LoginResponse {
     private String token;
     private String username;
     private Long userID;
+    private Double budgetTotal;
 
-    public LoginResponse(String token, String username,Long userID) {
+    public LoginResponse(String token, String username,Long userID,Double budgetTotal) {
         this.token = token;
         this.username = username;
         this.userID = userID;
+        this.budgetTotal = budgetTotal;
     }
 
     public String getToken() {
@@ -28,5 +30,8 @@ public class LoginResponse {
     } 
     public Long getUserID() {
         return userID;
+    }
+    public Double getBudgetTotal() {
+        return budgetTotal;
     }
 }

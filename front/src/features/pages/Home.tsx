@@ -39,7 +39,7 @@ export default function Home() {
 
     return (
         <div className="home">
-            <h1>Bienvenue sur la page d'accueil</h1>
+            <h1>Bienvenue sur la page d'accueil:</h1>
 
             <form onSubmit={soummetreBudget(budgetTotal, setErreur, setAffsuite)}>
                 <label htmlFor="budgetTotal">Saisir le budget(Ar)</label>
@@ -47,6 +47,9 @@ export default function Home() {
                 <button type="submit">Enregistrer</button>
             </form>
             {erreur && <p className="erreur">{erreur}</p>}
+            <div className="budget">
+                 {localStorage.getItem("budgetTotal") && <p>Budget total: {localStorage.getItem("budgetTotal")} Ar</p>}
+            </div>
             {/* {Affsuite && ( <form onSubmit={}>
                 Affichena eto ny liste an ny categorie
                 d asina input de buget tsirairay(izay tsy asina 

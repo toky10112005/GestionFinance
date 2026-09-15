@@ -16,5 +16,9 @@ public class BudgetService {
     public Budget saveBudget(Budget budget) {
         return budgetRepo.save(budget);
     }
+
+    public Budget findByClientId(Long clientId) {
+        return budgetRepo.findByClientId(clientId);
+    }
     
 }

@@ -4,6 +4,8 @@ import com.gestionbudget.service.ClientService;
 import com.gestionbudget.model.Client;
 import com.gestionbudget.dto.LoginRequest;
 import com.gestionbudget.dto.LoginResponse;
+import com.gestionbudget.service.BudgetService;
+import com.gestionbudget.model.Budget;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,10 +19,12 @@ public class AuthController {
 
     final private PasswordEncoder passwordEncoder;
     final private ClientService clientService;
+    final private BudgetService budgetService;
 
-    public AuthController(ClientService clientService, PasswordEncoder passwordEncoder) {
+    public AuthController(ClientService clientService, PasswordEncoder passwordEncoder, BudgetService budgetService) {
         this.clientService = clientService;
         this.passwordEncoder = passwordEncoder;
+        this.budgetService = budgetService;
     }
 
     @PostMapping("/login")
@@ -34,7 +38,11 @@ public class AuthController {
             // TODO: générer un vrai JWT
             String fakeToken = "token-genere-exemple";
             Long userID =user.getId();
-            LoginResponse response = new LoginResponse(fakeToken, username,userID);
+
+            Budget budgetTotal = budgetService.findByClientId(userID);
+            //System.out.println("Budget total: " + budgetTotal.getMontantTotal());
+
+            LoginResponse response = new LoginResponse(fakeToken, username,userID,budgetTotal.getMontantTotal());
             
             return ResponseEntity.ok(response);
         }

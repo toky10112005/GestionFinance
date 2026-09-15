@@ -28,6 +28,10 @@ function soumission(username: string, password: string, setErreur: (erreur: stri
                 localStorage.setItem("userID", data.userID);
             }
             
+            if(data.budgetTotal){
+                localStorage.setItem("budgetTotal", data.budgetTotal);
+            }
+            console.log("budget dans le compte:", data.budgetTotal);
             console.log("userID:", data.userID);
             navigate("/home");
             setErreur("");
