@@ -32,8 +32,16 @@ public class BudgetController {
         budget.setMontantTotal(budgetRequest.getBudgetTotal());
         //Ty mila maka an ilay valeur du mois courant..Mbola tsy mety Ito
         budget.setMonth(1);
-
-        Budget OK=budgetService.saveBudget(budget);
+        
+        Budget confirmation= budgetService.findByClientId(budgetRequest.getUserId());
+        Budget OK = null;
+        if(confirmation != null){
+            confirmation.setMontantTotal(budgetRequest.getBudgetTotal());
+            OK = budgetService.saveBudget(confirmation);
+        } else {
+           OK = budgetService.saveBudget(budget);
+        }
+        // Budget OK=budgetService.saveBudget(budget);
        BudgetResponse budgetResponse = new BudgetResponse(OK.getId(), OK.getMontantTotal(), OK.getClient().getId());
         return ResponseEntity.ok(budgetResponse);
     }

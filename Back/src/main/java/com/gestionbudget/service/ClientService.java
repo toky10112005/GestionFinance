@@ -1,17 +1,11 @@
 package com.gestionbudget.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.gestionbudget.model.Client;
 import com.gestionbudget.repository.ClientRepository;
 
-
-// import java.util.List;
-// import org.springframework.data.domain.Page;
-// import org.springframework.data.domain.Pageable;
-// import org.springframework.data.domain.PageRequest;
 
 @Service
 public class ClientService {

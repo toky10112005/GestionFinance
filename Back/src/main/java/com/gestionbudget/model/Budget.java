@@ -21,7 +21,7 @@ public class Budget {
     private int month;
 
     @Column(name="montant_total")
-    private double montantTotal;
+    private Double montantTotal;
 
     
 }

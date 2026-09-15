@@ -1,8 +1,9 @@
 import { useState, type SubmitEvent } from "react";
 
-function soummetreBudget(budgetTotal: number, setErreur: (erreur: string) => void, setAffsuite: (affsuite: boolean) => void) {
+function soummetreBudget(budgetTotal: number, setErreur: (erreur: string) => void, setAffsuite: (affsuite: boolean) => void, setBudgetAffiche: (budget: string) => void) {
     const genererSoummission =async (event:SubmitEvent<HTMLFormElement>)=>{
         event.preventDefault();
+        
         try{
             const userID=localStorage.getItem("userID");
             const response=await fetch("http://localhost:8081/api/budget/budgetTotal", {
@@ -21,6 +22,10 @@ function soummetreBudget(budgetTotal: number, setErreur: (erreur: string) => voi
             }
              const data=await response.json();
               console.log(data);
+
+            setBudgetAffiche(data.budgetTotal.toString());
+
+              localStorage.setItem("budgetTotal", data.budgetTotal.toString());
             //reponse de spring c'est une Liste des catégorie
            
         }catch(error){
@@ -36,19 +41,22 @@ export default function Home() {
     const [budgetTotal, setBudgetTotal] = useState(0);
     const [erreur, setErreur] = useState("");
     const [Affsuite, setAffsuite] = useState(false);
+    const [budgetAffiche, setBudgetAffiche] = useState<string>(
+        localStorage.getItem("budgetTotal") || ""
+    );
 
     return (
         <div className="home">
             <h1>Bienvenue sur la page d'accueil:</h1>
 
-            <form onSubmit={soummetreBudget(budgetTotal, setErreur, setAffsuite)}>
+            <form onSubmit={soummetreBudget(budgetTotal, setErreur, setAffsuite,setBudgetAffiche)}>
                 <label htmlFor="budgetTotal">Saisir le budget(Ar)</label>
-                <input type="number" placeholder="Saisir le budget" id="budgetTotal"value={budgetTotal} onChange={(e) => setBudgetTotal(parseFloat(e.target.value))} />
+                <input type="number" placeholder="Saisir le budget" id="budgetTotal" value={budgetTotal} onChange={(e) => setBudgetTotal(parseFloat(e.target.value))} />
                 <button type="submit">Enregistrer</button>
             </form>
             {erreur && <p className="erreur">{erreur}</p>}
             <div className="budget">
-                 {localStorage.getItem("budgetTotal") && <p>Budget total: {localStorage.getItem("budgetTotal")} Ar</p>}
+                 {budgetAffiche && <p>Budget total: {budgetAffiche} Ar</p>}
             </div>
             {/* {Affsuite && ( <form onSubmit={}>
                 Affichena eto ny liste an ny categorie

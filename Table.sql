@@ -33,7 +33,7 @@ CREATE TABLE "budget" (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    UNIQUE(client_id, month)   -- Un seul budget par mois et par client
+    UNIQUE(client_id, month)  -- Un seul budget par mois et par client
 );
 
 CREATE TABLE "budget_categorie" (

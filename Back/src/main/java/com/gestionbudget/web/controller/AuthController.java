@@ -41,8 +41,11 @@ public class AuthController {
 
             Budget budgetTotal = budgetService.findByClientId(userID);
             //System.out.println("Budget total: " + budgetTotal.getMontantTotal());
-
-            LoginResponse response = new LoginResponse(fakeToken, username,userID,budgetTotal.getMontantTotal());
+           Double montantenvoyer = (budgetTotal != null && budgetTotal.getMontantTotal() != null) 
+                        ? budgetTotal.getMontantTotal() 
+                        : 0.0;
+               
+            LoginResponse response = new LoginResponse(fakeToken, username,userID,montantenvoyer);
             
             return ResponseEntity.ok(response);
         }

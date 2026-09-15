@@ -2,9 +2,7 @@ package com.gestionbudget.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
-// import javax.annotation.processing.Generated;
 
 @Table(name ="client")
 @Entity
