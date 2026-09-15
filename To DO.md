@@ -27,7 +27,7 @@
         1.Création Input pour saisir le budget.Toky
     <!-- on considérera que le budget servira jusqu'à la fin du mois -->
         2.Enregister dans la base Toky
-        3.Affichage du budget saisis dans home
+        3.Affichage du budget saisis dans home  Toky
         4.Possibilité de changer le budget saisis
 
     D.Affichage des budgets:

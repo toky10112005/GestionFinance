@@ -5,5 +5,5 @@
 
 # Mamerena mampiditra base fa nasiko hash ilay mot de passe.
 
-# Efa afaka mampiditra Budget(budget du mois).D tokony hoe rehefa avy mampiditra an ilay izy d mipoitra eo ambany eo ny input de categorie.
-
+ 
+# Raha ohatra ka Utilisateur efa nampiditra budget Total no mbola mampiditra d mamôka erreur(Manana chois hoe ilay fonction ao ihany v no ampiasaina sa manao hafa) F tokony mis à jour ilay valeur du budget total
