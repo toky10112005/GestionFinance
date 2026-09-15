@@ -21,6 +21,7 @@
         10.Hashage de mot de passe. Toky
         11.Stocker en Session l'ID de l'utilisateur connecté. Toky
         12.Mila amboarine le fangalana an ilay mois rehefa mampiditra budget(mila maka an ilay mois courant)
+        13. Middleware. Rova
 
     C.Input de Budget: En cours
     Ao @page home no miasa

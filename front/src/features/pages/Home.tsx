@@ -58,6 +58,7 @@ export default function Home() {
             <div className="budget">
                  {budgetAffiche && <p>Budget total: {budgetAffiche} Ar</p>}
             </div>
+            <p><a href="/deconnexion">Se déconnecter</a></p>
             {/* {Affsuite && ( <form onSubmit={}>
                 Affichena eto ny liste an ny categorie
                 d asina input de buget tsirairay(izay tsy asina 
