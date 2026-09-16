@@ -9,3 +9,5 @@
 # Raha ohatra ka Utilisateur efa nampiditra budget Total no mbola mampiditra d mamôka erreur(Manana chois hoe ilay fonction ao ihany v no ampiasaina sa manao hafa) F tokony mis à jour ilay valeur du budget total
 
 # Misy bugs kely eo @ilay affichage de budget total.Misy temps de retard le valeur an ilay session.Mety ilay izy f misy retard
+
+# Mety ilay affichege de categorie f ny olana tsy @voalohany ilay izy no mipoitra.Tokony hoe mipoitra ilay liste rehefa Tsy 0 ny valeur an ilay budget an ilay olona .F eto izy mbola mila mampiditra valeur vaovao vao mipoitra ilay list.

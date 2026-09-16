@@ -1,71 +1,108 @@
-import { useState, type SubmitEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 
-function soummetreBudget(budgetTotal: number, setErreur: (erreur: string) => void, setAffsuite: (affsuite: boolean) => void, setBudgetAffiche: (budget: string) => void) {
-    const genererSoummission =async (event:SubmitEvent<HTMLFormElement>)=>{
+function soummetreBudget(
+    budgetTotal: number, 
+    setErreur: (erreur: string) => void, 
+    setAffsuite: (affsuite: boolean) => void, 
+    setBudgetAffiche: (budget: number) => void, 
+    setCategories: (categories: any[]) => void
+) {
+    const genererSoummission = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setErreur("");
         
-        try{
-            const userID=localStorage.getItem("userID");
-            const response=await fetch("http://localhost:8081/api/budget/budgetTotal", {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
+        try {
+            const userID = localStorage.getItem("userID");
+            const response = await fetch("http://localhost:8081/api/budget/budgetTotal", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
                 },
-                
-                body: JSON.stringify({ userId: Number(userID),budgetTotal}),
+                body: JSON.stringify({ userId: Number(userID), budgetTotal }),
             });
-            if(!response.ok){
+
+            if (!response.ok) {
                 setErreur("Erreur lors de la soumission du budget total");
+                return;
             }
-            else{
+
+            const data = await response.json();
+
+            if (data.budgetTotal !== undefined) {
+                const valNum = Number(data.budgetTotal);
+                setBudgetAffiche(valNum);
+                localStorage.setItem("budgetTotal", valNum.toString());
+            }
+
+            if (data.categories && data.categories.length > 0) {
                 setAffsuite(true);
+                setCategories(data.categories);
+                // Sauvegarde pour conserver l'affichage après un rafraîchissement
+                localStorage.setItem("categories", JSON.stringify(data.categories));
             }
-             const data=await response.json();
-              console.log(data);
-
-            setBudgetAffiche(data.budgetTotal.toString());
-
-            localStorage.setItem("budgetTotal", data.budgetTotal.toString());
-            //reponse de spring c'est une Liste des catégorie
            
-        }catch(error){
-            throw new Error("Erreur lors de la soumission du Budget total");
+        } catch (error) {
+            setErreur("Erreur lors de la connexion au serveur");
         }
-
     };
     return genererSoummission;
 }
 
-
 export default function Home() {
-    const [budgetTotal, setBudgetTotal] = useState(0);
-    const [erreur, setErreur] = useState("");
-    const [Affsuite, setAffsuite] = useState(false);
-    const [budgetAffiche, setBudgetAffiche] = useState<string>(
-        localStorage.getItem("budgetTotal") || ""
-    );
+    const [budgetTotal, setBudgetTotal] = useState<number>(0);
+    const [erreur, setErreur] = useState<string>("");
+    const [Affsuite, setAffsuite] = useState<boolean>(false);
+    const [budgetAffiche, setBudgetAffiche] = useState<number>(0);
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+        const localBudget = localStorage.getItem("budgetTotal");
+        const localCategories = localStorage.getItem("categories");
+
+        if (localBudget) {
+            setBudgetAffiche(parseFloat(localBudget));
+        }
+
+        if (localCategories) {
+            setCategories(JSON.parse(localCategories));
+        }
+    }, []);
 
     return (
         <div className="home">
             <h1>Bienvenue sur la page d'accueil:</h1>
 
-            <form onSubmit={soummetreBudget(budgetTotal, setErreur, setAffsuite,setBudgetAffiche)}>
+            <form onSubmit={soummetreBudget(budgetTotal, setErreur, setAffsuite, setBudgetAffiche, setCategories)}>
                 <label htmlFor="budgetTotal">Saisir le budget(Ar)</label>
-                <input type="number" placeholder="Saisir le budget" id="budgetTotal" value={budgetTotal} onChange={(e) => setBudgetTotal(parseFloat(e.target.value))} />
+                <input 
+                    type="number" 
+                    placeholder="Saisir le budget" 
+                    id="budgetTotal" 
+                    value={budgetTotal || 0} 
+                    onChange={(e) => setBudgetTotal(parseFloat(e.target.value) || 0)} 
+                />
                 <button type="submit">Enregistrer</button>
             </form>
+
             {erreur && <p className="erreur">{erreur}</p>}
+
             <div className="budget">
-                 {budgetAffiche && <p>Budget total: {budgetAffiche} Ar</p>}
+                 {/* Formatage pour l'affichage numérique uniquement */}
+                 {budgetAffiche !== 0 && <p>Budget total: {budgetAffiche.toLocaleString()} Ar</p>}
             </div>
+
             <p><a href="/deconnexion">Se déconnecter</a></p>
-            {/* {Affsuite && ( <form onSubmit={}>
-                Affichena eto ny liste an ny categorie
-                d asina input de buget tsirairay(izay tsy asina 
-                valeur d 0 par defaut)
-            </form>)} */}
-           
-            
+
+            {/* Affiche le bloc si budgetAffiche est supérieur à 0 et qu'il y a des catégories */}
+            {(Affsuite || budgetAffiche > 0) && categories.length > 0 && (
+                <form>
+                    <ul>
+                        {categories.map((categorie) => (
+                            <li key={categorie.id}>{categorie.name}</li>
+                        ))}
+                    </ul>        
+                </form>
+            )}
         </div>
     );
 }
