@@ -10,6 +10,7 @@ import com.gestionbudget.service.ClientService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -30,8 +31,7 @@ public class BudgetController {
         Client client = clientService.findByID(budgetRequest.getUserId());
         budget.setClient(client);
         budget.setMontantTotal(budgetRequest.getBudgetTotal());
-        //Ty mila maka an ilay valeur du mois courant..Mbola tsy mety Ito
-        budget.setMonth(1);
+        budget.setMonth(LocalDate.now().getMonthValue());
         
         Budget confirmation= budgetService.findByClientId(budgetRequest.getUserId());
         Budget OK = null;

@@ -25,7 +25,7 @@ function soummetreBudget(budgetTotal: number, setErreur: (erreur: string) => voi
 
             setBudgetAffiche(data.budgetTotal.toString());
 
-              localStorage.setItem("budgetTotal", data.budgetTotal.toString());
+            localStorage.setItem("budgetTotal", data.budgetTotal.toString());
             //reponse de spring c'est une Liste des catégorie
            
         }catch(error){
