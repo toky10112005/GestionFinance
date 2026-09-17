@@ -12,4 +12,4 @@
 
 # Mety ilay affichege de categorie f ny olana tsy @voalohany ilay izy no mipoitra.Tokony hoe mipoitra ilay liste rehefa Tsy 0 ny valeur an ilay budget an ilay olona .F eto izy mbola mila mampiditra valeur vaovao vao mipoitra ilay list.
 
-#azafady eee ts hitako le message fa nataoko le css eee
+# azafady eee ts hitako le message fa nataoko le css eee
