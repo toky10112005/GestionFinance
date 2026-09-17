@@ -2,6 +2,7 @@ package com.gestionbudget.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Table (name="categorie_list")
 @Entity
@@ -14,4 +15,7 @@ public class CategorieList {
 
     @Column (name="name")
     private String name;
+
+    @ManyToMany(mappedBy = "categorieList")
+    private List<BudgetCategorie> budgets;
 }

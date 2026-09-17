@@ -13,3 +13,9 @@
 # Mety ilay affichege de categorie f ny olana tsy @voalohany ilay izy no mipoitra.Tokony hoe mipoitra ilay liste rehefa Tsy 0 ny valeur an ilay budget an ilay olona .F eto izy mbola mila mampiditra valeur vaovao vao mipoitra ilay list.
 
 # azafady eee ts hitako le message fa nataoko le css eee
+
+# Nisy nokitiako kely le base
+
+# efa mandeha n formulaire an'le categorie fa bola ts nasiko erreur ref miaotra n vola , de condition oe ref avy manao enregistrement indray de ts afaka manao intson avy eo 
+
+# refa manampy table la de aza asina majuscule le izy fa mi-casse le code 

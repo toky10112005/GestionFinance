@@ -8,7 +8,9 @@ import com.gestionbudget.dto.BudgetRequest;
 import com.gestionbudget.dto.BudgetResponse;
 import com.gestionbudget.service.ClientService;
 import com.gestionbudget.service.CategorieListService;
-
+import com.gestionbudget.dto.BCategorie;
+import com.gestionbudget.model.BudgetCategorie;
+import com.gestionbudget.service.BudgetCategorieService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,11 +25,13 @@ public class BudgetController {
     private final BudgetService budgetService;
     private final ClientService clientService;
     private final CategorieListService categorieListService;
+    private final BudgetCategorieService budgetCategorieService;
 
-    public BudgetController(BudgetService budgetService, ClientService clientService, CategorieListService categorieListService) {
+    public BudgetController(BudgetService budgetService, ClientService clientService, CategorieListService categorieListService, BudgetCategorieService budgetCategorieService) {
         this.budgetService = budgetService;
         this.clientService = clientService;
         this.categorieListService = categorieListService;
+        this.budgetCategorieService = budgetCategorieService;
     }
 
     @PostMapping("/budgetTotal")
@@ -53,5 +57,23 @@ public class BudgetController {
 
        BudgetResponse budgetResponse = new BudgetResponse(OK.getId(), OK.getMontantTotal(), OK.getClient().getId(),categoriesList);
         return ResponseEntity.ok(budgetResponse);
+    }
+
+    @PostMapping("/budgetCategorie")
+    public ResponseEntity<?> saveBudgetCategorie (@RequestBody BCategorie bCategorie) {
+        Budget budget = budgetService.findByClientId(bCategorie.getUserId());
+        if (budget == null) {
+            return ResponseEntity.badRequest().body("Budget not found for userId: " + bCategorie.getUserId());
+        }
+
+        for (int i = 0; i < bCategorie.getMontant().length; i++) {
+            BudgetCategorie budgetCategorie = new BudgetCategorie();
+            budgetCategorie.setBudget(budget);
+            CategorieList categorieList = categorieListService.getCategorieById((long) (i + 1));
+            budgetCategorie.setCategorieList(categorieList);
+            budgetCategorie.setMontant(bCategorie.getMontant()[i]);
+            budgetCategorieService.saveBudgetCategorie(budgetCategorie);
+        }
+        return ResponseEntity.ok(true);
     }
 }

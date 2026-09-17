@@ -48,12 +48,46 @@ function soummetreBudget(
     return genererSoummission;
 }
 
+function soummetreBudgetCategorie(
+    budgetcategorie: number[], 
+    setErreur: (erreur: string) => void
+) {
+    const genererSoummissionCategorie = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setErreur("");
+        console.log("Budget par catégorie à soumettre :", budgetcategorie);
+        try {
+            const userID = localStorage.getItem("userID");
+            const response = await fetch("http://localhost:8081/api/budget/budgetCategorie", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ userId: Number(userID), montant: budgetcategorie }),
+            });
+
+            if (!response.ok) {
+                setErreur("Erreur lors de la soumission des budgets par catégorie");
+                return;
+            }
+
+            const data = await response.json();
+            
+            
+        } catch (error) {
+            setErreur("Erreur lors de la connexion au serveur");
+        }
+    };
+    return genererSoummissionCategorie;
+}
+
 export default function Home() {
     const [budgetTotal, setBudgetTotal] = useState<number>(0);
     const [erreur, setErreur] = useState<string>("");
     const [Affsuite, setAffsuite] = useState<boolean>(false);
     const [budgetAffiche, setBudgetAffiche] = useState<number>(0);
     const [categories, setCategories] = useState<any[]>([]);
+    const [budgetcategorie, setBudgetCategorie] = useState<number[]>([]);
 
     useEffect(() => {
         const localBudget = localStorage.getItem("budgetTotal");
@@ -67,6 +101,12 @@ export default function Home() {
             setCategories(JSON.parse(localCategories));
         }
     }, []);
+
+    for (let i = 0; i < categories.length; i++) {
+        if (budgetcategorie[i] === undefined) {
+            budgetcategorie[i] = 0;
+        }
+    }
 
     return (
         <div className="home min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
@@ -113,15 +153,36 @@ export default function Home() {
                 </div>
 
                 {(Affsuite || budgetAffiche > 0) && categories.length > 0 && (
-                    <form className="bg-neutral-800/50 p-4 rounded-lg border border-neutral-700">
-                        <p className="text-sm font-medium text-amber-400 mb-2">Catégories :</p>
-                        <ul className="space-y-2">
-                            {categories.map((categorie) => (
-                                <li key={categorie.id} className="bg-neutral-900 px-3 py-2 rounded-md border border-amber-500/10 text-sm text-gray-200">
-                                    {categorie.name}
-                                </li>
-                            ))}
-                        </ul>        
+                    <form onSubmit={soummetreBudgetCategorie(budgetcategorie, setErreur)} className="space-y-4">
+                        <h2 className="text-lg font-semibold text-center text-gold-hover">Budgets par catégorie</h2>
+
+                        {categories.map((categorie, index) => (
+                            <div key={categorie.id}>
+                                <label htmlFor={`categorie-${categorie.id}`} className="block text-sm font-medium text-gold-hover mb-1">
+                                    Budget pour {categorie.name} (Ar):
+                                </label>
+                                <input
+                                    type="number"
+                                    id={`categorie-${categorie.id}`}
+                                    placeholder="Saisir le budget"
+                                    value={budgetcategorie[index] || 0}
+                                    onChange={(e) => {
+                                        const montants = [...budgetcategorie];
+                                        montants[index] = parseFloat(e.target.value) || 0;
+                                        setBudgetCategorie(montants);
+                                    }}
+                                    required
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+                                />
+                            </div>
+                        ))}
+
+                        <button
+                            type="submit"
+                            className="w-full bg-gold-hover hover:bg-gold hover:text-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+                        >
+                            Enregistrer les budgets par catégorie
+                        </button>
                     </form>
                 )}
 
