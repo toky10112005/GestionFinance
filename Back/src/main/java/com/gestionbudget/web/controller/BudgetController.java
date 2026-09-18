@@ -6,6 +6,8 @@ import com.gestionbudget.model.Client;
 import com.gestionbudget.model.CategorieList;
 import com.gestionbudget.dto.BudgetRequest;
 import com.gestionbudget.dto.BudgetResponse;
+import com.gestionbudget.dto.BudgetEtatResponse;
+import com.gestionbudget.dto.CategorieMontantDTO;
 import com.gestionbudget.service.ClientService;
 import com.gestionbudget.service.CategorieListService;
 import com.gestionbudget.dto.BCategorie;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -32,6 +36,46 @@ public class BudgetController {
         this.clientService = clientService;
         this.categorieListService = categorieListService;
         this.budgetCategorieService = budgetCategorieService;
+    }
+
+    // Nouvel endpoint : renvoie l'état RÉEL du budget d'un utilisateur, tel qu'enregistré en base.
+    // C'est ce que Home.tsx doit appeler au montage, à la place de localStorage,
+    // pour que la liste des catégories et le budget total s'affichent correctement
+    // dès la connexion, quel que soit l'état du navigateur (déconnexion, autre appareil, etc.).
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getBudgetEtat(@PathVariable Long userId) {
+        Budget budget = budgetService.findByClientId(userId);
+        List<CategorieList> categoriesList = categorieListService.getAllCategories();
+
+        if (budget == null) {
+            // Aucun budget créé pour l'instant : on renvoie quand même la liste
+            // des catégories (montant à 0 partout) pour que le front sache
+            // qu'il existe des catégories, sans budget total défini.
+            List<CategorieMontantDTO> categoriesVides = categoriesList.stream()
+                    .map(cat -> new CategorieMontantDTO(cat.getId(), cat.getName(), 0.0))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new BudgetEtatResponse(0.0, categoriesVides));
+        }
+
+        List<BudgetCategorie> budgetCategories = budgetCategorieService.getByBudgetId(budget.getId());
+
+        // Table de correspondance catégorieId -> montant déjà enregistré
+        Map<Long, Double> montantParCategorieId = budgetCategories.stream()
+                .collect(Collectors.toMap(
+                        bc -> bc.getCategorieList().getId(),
+                        BudgetCategorie::getMontant,
+                        (ancien, nouveau) -> nouveau
+                ));
+
+        List<CategorieMontantDTO> categoriesDTO = categoriesList.stream()
+                .map(cat -> new CategorieMontantDTO(
+                        cat.getId(),
+                        cat.getName(),
+                        montantParCategorieId.getOrDefault(cat.getId(), 0.0)
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new BudgetEtatResponse(budget.getMontantTotal(), categoriesDTO));
     }
 
     @PostMapping("/budgetTotal")

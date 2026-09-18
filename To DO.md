@@ -32,10 +32,11 @@
         4.Possibilité de changer le budget saisis   Toky
 
     D.Affichage des budgets:    Toky En cours
-        1.Création des input pour permettre à l'utilisateur de saisir le budget de chaque catégorie.
+        1.Création des input pour permettre à l'utilisateur de saisir le budget de chaque catégorie. Rova
         2.Après la saisi des budgets des catégories,l'utilisateur peut enfin reappuiyer sur la categorie pour saisir les montant de dépense.
         3.Affichage des dépenses par catégorie.
         4.Affichage de la progression ds dépenses par rapport au budget de chaque catégorie.
 
 
-# Implémentation ds fonctionnalité Tiers: 
+# Implémentation ds fonctionnalité Tiers:
+    A. Mettre en place une fonctionnalité qui permet à l'app de vérifier si le budget est suffisant par rapport aux valeurs des budget mis dans les catégories. Toky

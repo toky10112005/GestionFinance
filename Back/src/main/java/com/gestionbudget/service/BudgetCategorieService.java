@@ -26,6 +26,12 @@ public class BudgetCategorieService {
         return budgetCategorieRepository.findById(id).orElse(null);
     }
 
+    // Nouvelle méthode : récupère les BudgetCategorie déjà enregistrées
+    // pour un Budget donné (utilisée par le nouvel endpoint GET /api/budget/{userId}).
+    public List<BudgetCategorie> getByBudgetId(Long budgetId) {
+        return budgetCategorieRepository.findByBudget_Id(budgetId);
+    }
+
     public BudgetCategorie updateBudgetCategorie(Long id, BudgetCategorie budgetCategorie) {
         BudgetCategorie existingBudgetCategorie = getBudgetCategorieById(id);
 
