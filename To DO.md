@@ -40,3 +40,4 @@
 
 # Implémentation ds fonctionnalité Tiers:
     A. Mettre en place une fonctionnalité qui permet à l'app de vérifier si le budget est suffisant par rapport aux valeurs des budget mis dans les catégories. Toky
+    B.Lorsque le budget Total est insuffisant on ne peut plus saisir de valeur supérieur dans les input des budget. Toky

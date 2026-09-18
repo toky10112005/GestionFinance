@@ -23,3 +23,5 @@
 # Tena Nanamboatra bugs sy niala an ilay resaka LocalStrorage no nataoko teto zao
 
 # ny zavatra mia atao zao d ny hoe rehefa mianova na manisy valeur vaovao ilay client iray de manao update raha efa ao anaty base.
+
+# Fonctionalité mila apiana sisa zao dia ilay hoe mampiditra an 'ilay dépense.

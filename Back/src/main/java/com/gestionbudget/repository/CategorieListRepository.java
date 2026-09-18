@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.*;
 
 @Repository
 public interface CategorieListRepository extends JpaRepository<CategorieList, Long> {
-    
+  
 }

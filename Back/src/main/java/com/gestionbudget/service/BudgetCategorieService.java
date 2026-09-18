@@ -53,4 +53,8 @@ public class BudgetCategorieService {
         budgetCategorieRepository.deleteById(id);
         return true;
     }
+
+    public BudgetCategorie findByBudgetIdCategorieId(Long budgetId, Long categorieId) {
+        return budgetCategorieRepository.findByBudgetIdCategorieId(budgetId, categorieId);
+    }
 }

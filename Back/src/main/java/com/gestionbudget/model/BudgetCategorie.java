@@ -3,6 +3,8 @@ package com.gestionbudget.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -24,4 +26,7 @@ public class BudgetCategorie {
 
     @Column(name = "montant")
     private Double montant;
+
+    @Column (name = "created_at")
+    private String createdAt;
 }

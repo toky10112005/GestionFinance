@@ -111,12 +111,22 @@ public class BudgetController {
         }
 
         for (int i = 0; i < bCategorie.getMontant().length; i++) {
+
             BudgetCategorie budgetCategorie = new BudgetCategorie();
             budgetCategorie.setBudget(budget);
             CategorieList categorieList = categorieListService.getCategorieById((long) (i + 1));
-            budgetCategorie.setCategorieList(categorieList);
-            budgetCategorie.setMontant(bCategorie.getMontant()[i]);
-            budgetCategorieService.saveBudgetCategorie(budgetCategorie);
+            BudgetCategorie verification = budgetCategorieService.findByBudgetIdCategorieId(budget.getId(), categorieList.getId());
+            if (verification != null) {
+                verification.setMontant(bCategorie.getMontant()[i]);
+                verification.setCreatedAt(LocalDate.now().toString());
+                budgetCategorieService.saveBudgetCategorie(verification);
+            }else{
+
+                budgetCategorie.setCategorieList(categorieList);
+                budgetCategorie.setMontant(bCategorie.getMontant()[i]);
+                budgetCategorieService.saveBudgetCategorie(budgetCategorie);
+            }
+
         }
         return ResponseEntity.ok(true);
     }
