@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS "categorie_list" CASCADE;
 DROP TABLE IF EXISTS "categorie" CASCADE;
 DROP TABLE IF EXISTS "budget" CASCADE;
 DROP TABLE IF EXISTS "budget_categorie" CASCADE;
+DROP TABLE IF EXISTS "depense" CASCADE;
 
 CREATE TABLE IF NOT EXISTS "client"(
     id SERIAL PRIMARY KEY,
@@ -51,4 +52,12 @@ CREATE TABLE "budget_categorie" (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     UNIQUE(budget_id, categorieList_id)  -- Une catégorie ne peut apparaître qu'une seule fois dans un budget
+);
+
+CREATE TABLE depense(
+    id SERIAL PRIMARY KEY,
+    budget_categorie_id INT NOT NULL REFERENCES budget_categorie(id) ON DELETE CASCADE,
+    montant DECIMAL(12,2) NOT NULL CHECK (montant > 0),  -- Montant de la dépense
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

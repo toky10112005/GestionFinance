@@ -25,3 +25,8 @@
 # ny zavatra mia atao zao d ny hoe rehefa mianova na manisy valeur vaovao ilay client iray de manao update raha efa ao anaty base.
 
 # Fonctionalité mila apiana sisa zao dia ilay hoe mampiditra an 'ilay dépense.
+
+# efa mety le input de depense.Ny amboarina sisa momban ny depense d asina condition hoe tsy mahazo négative les valin ny calcule.D afaka manisy historique tsika raha t
+
+# En gros zany resaka historique(facultatif),resaka sécurité d manao test final tsika d déploiyement zany demain.
+

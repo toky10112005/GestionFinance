@@ -25,9 +25,8 @@ function soummetreBudget(
             }
 
             // Au lieu de faire confiance à la réponse du POST (dont la forme des
-            // catégories diffère de celle du GET, sans le champ "montant"), on
-            // recharge l'état complet et à jour depuis la même source de vérité
-            // que celle utilisée au montage de la page.
+            // catégories diffère de celle du GET), on recharge l'état complet et
+            // à jour depuis la même source de vérité que celle utilisée au montage.
             await rechargerEtatBudget();
         } catch (error) {
             setErreur("Erreur lors de la connexion au serveur");
@@ -76,29 +75,79 @@ function soummetreBudgetCategorie(
     return genererSoummissionCategorie;
 }
 
+// Appelée par le bouton "Valider" du pop-up de dépense. Envoie la dépense
+// au backend (POST /api/budget/depense), qui NE modifie PAS le montant alloué
+// à la catégorie : il enregistre juste la dépense. Une fois confirmé, on
+// recharge l'état réel pour que le "montant restant" affiché dans l'input
+// de la catégorie reflète la dépense, sans toucher au montant alloué (donc
+// sans affecter le budget courant).
+async function validerDepense(
+    categorie: any,
+    montantDepense: number,
+    setErreur: (erreur: string) => void,
+    rechargerEtatBudget: () => Promise<void>
+) {
+    setErreur("");
+    try {
+        const userID = localStorage.getItem("userID");
+        const response = await fetch("http://localhost:8081/api/budget/depense", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                categorieId: categorie?.id,
+                userId: userID !== null ? Number(userID) : null,
+                montant: montantDepense,
+            }),
+        });
+
+        if (!response.ok) {
+            setErreur("Erreur lors de l'enregistrement de la dépense");
+            return;
+        }
+
+        await rechargerEtatBudget();
+    } catch (error) {
+        setErreur("Erreur lors de la connexion au serveur");
+    }
+}
+
 export default function Home() {
     const [budgetTotal, setBudgetTotal] = useState<number>(0);
     const [erreur, setErreur] = useState<string>("");
     const [Affsuite, setAffsuite] = useState<boolean>(false);
     const [budgetAffiche, setBudgetAffiche] = useState<number>(0);
     const [categories, setCategories] = useState<any[]>([]);
+
+    // budgetcategorie : montant RESTANT par catégorie (alloué - dépenses).
+    // C'est ce qui s'affiche et se modifie dans les inputs du formulaire.
     const [budgetcategorie, setBudgetCategorie] = useState<number[]>([]);
+
+    // budgetCategorieAlloue : montant ALLOUÉ par catégorie, tel que défini par
+    // l'utilisateur, indépendant des dépenses. Sert uniquement au calcul du
+    // budget courant, jamais affiché ni modifié directement dans un input.
+    const [budgetCategorieAlloue, setBudgetCategorieAlloue] = useState<number[]>([]);
+
     const [blocker, setBlocker] = useState<boolean>(false);//ty iblokena ny input raha ilaina
 
-    // Budget courant = Budget total (fixe, tel que saisi) - somme des budgets par
-    // catégorie actuellement dans les inputs. C'est une valeur dérivée, recalculée
-    // à chaque rendu (donc à chaque frappe de l'utilisateur), pas un état séparé :
-    // ça garantit qu'elle est toujours synchronisée avec ce que l'utilisateur voit
-    // à l'écran, sans risque de désynchronisation.
-    const sommeCategories = budgetcategorie.reduce((acc, curr) => acc + (curr || 0), 0);
-    const budgetCourant = budgetAffiche - sommeCategories;
+    // Etat du pop-up de saisie de dépense : l'index de la catégorie concernée
+    // (null = pop-up fermé) et le montant en cours de saisie dans le pop-up.
+    const [popupCategorieIndex, setPopupCategorieIndex] = useState<number | null>(null);
+    const [montantDepense, setMontantDepense] = useState<number>(0);
+
+    // Budget courant = Budget total (fixe, tel que saisi) - somme des montants
+    // ALLOUÉS par catégorie. Une dépense ne change pas ce qui a été alloué,
+    // donc elle n'affecte jamais budgetCourant : seul l'input de la catégorie
+    // concernée reflète la dépense (via budgetcategorie / montant restant).
+    const sommeAlloue = budgetCategorieAlloue.reduce((acc, curr) => acc + (curr || 0), 0);
+    const budgetCourant = budgetAffiche - sommeAlloue;
 
     // Fonction unique de rechargement de l'état, réutilisée :
     //  - au montage de la page,
     //  - après la soumission du budget total,
-    //  - après la soumission des budgets par catégorie.
-    // C'est la seule fonction qui écrit dans budgetAffiche / categories / budgetcategorie
-    // à partir de données serveur, ce qui garantit une forme toujours cohérente.
+    //  - après la soumission des budgets par catégorie,
+    //  - après l'enregistrement d'une dépense.
     const chargerEtatBudget = async () => {
         const userID = localStorage.getItem("userID");
         if (!userID) {
@@ -121,7 +170,10 @@ export default function Home() {
             if (data.categories && data.categories.length > 0) {
                 setCategories(data.categories);
                 setBudgetCategorie(
-                    data.categories.map((cat: any) => Number(cat.montant) || 0)
+                    data.categories.map((cat: any) => Number(cat.montantRestant) || 0)
+                );
+                setBudgetCategorieAlloue(
+                    data.categories.map((cat: any) => Number(cat.montantAlloue) || 0)
                 );
             }
 
@@ -137,10 +189,19 @@ export default function Home() {
         chargerEtatBudget();
     }, []);
 
-    // Garde-fou : si jamais categories change sans que budgetcategorie soit
-    // encore aligné (cas limite), on complète les index manquants avec 0.
+    // Garde-fou : si jamais categories change sans que les tableaux soient
+    // encore alignés (cas limite), on complète les index manquants avec 0.
     useEffect(() => {
         setBudgetCategorie((prev) => {
+            const next = [...prev];
+            for (let i = 0; i < categories.length; i++) {
+                if (next[i] === undefined) {
+                    next[i] = 0;
+                }
+            }
+            return next;
+        });
+        setBudgetCategorieAlloue((prev) => {
             const next = [...prev];
             for (let i = 0; i < categories.length; i++) {
                 if (next[i] === undefined) {
@@ -205,6 +266,11 @@ export default function Home() {
                         Le budget total est insuffisant pour couvrir les budgets des catégories. Ajustez les montants par catégorie.
                     </p>
                 )}
+                {erreur && (
+                    <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200 text-center">
+                        {erreur}
+                    </p>
+                )}
 
                 {(Affsuite || budgetAffiche > 0) && categories.length > 0 && (
                     <form onSubmit={soummetreBudgetCategorie(budgetAffiche, budgetcategorie, setErreur, setBlocker, blocker, chargerEtatBudget)} className="space-y-4">
@@ -228,6 +294,19 @@ export default function Home() {
                                     required
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
                                 />
+
+                                {budgetcategorie[index] !== 0 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setMontantDepense(0);
+                                            setPopupCategorieIndex(index);
+                                        }}
+                                        className="mt-1 text-xs text-amber-400 hover:text-amber-300 underline"
+                                    >
+                                        + Ajouter une dépense
+                                    </button>
+                                )}
                             </div>
                         ))}
 
@@ -247,6 +326,42 @@ export default function Home() {
                     </a>
                 </p>
             </div>
+
+            {/* Pop-up de saisie de dépense, affiché quand popupCategorieIndex !== null */}
+            {popupCategorieIndex !== null && (
+                <div
+                    className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+                    onClick={() => setPopupCategorieIndex(null)}
+                >
+                    <div
+                        className="w-full max-w-xs bg-neutral-900 border border-amber-500/30 rounded-xl shadow-2xl p-6 space-y-4"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 className="text-md font-semibold text-gold-hover text-center">
+                            Dépense pour {categories[popupCategorieIndex]?.name}
+                        </h3>
+
+                        <input
+                            type="number"
+                            placeholder="Montant de la dépense"
+                            value={montantDepense || 0}
+                            onChange={(e) => setMontantDepense(parseFloat(e.target.value) || 0)}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+                        />
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                validerDepense(categories[popupCategorieIndex], montantDepense, setErreur, chargerEtatBudget);
+                                setPopupCategorieIndex(null);
+                            }}
+                            className="w-full bg-gold-hover hover:bg-gold hover:text-black text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+                        >
+                            Valider
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

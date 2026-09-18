@@ -3,12 +3,14 @@ package com.gestionbudget.dto;
 public class CategorieMontantDTO {
     private Long id;
     private String name;
-    private Double montant;
+    private Double montantAlloue;
+    private Double montantRestant;
 
-    public CategorieMontantDTO(Long id, String name, Double montant) {
+    public CategorieMontantDTO(Long id, String name, Double montantAlloue, Double montantRestant) {
         this.id = id;
         this.name = name;
-        this.montant = montant;
+        this.montantAlloue = montantAlloue;
+        this.montantRestant = montantRestant;
     }
 
     public Long getId() {
@@ -27,11 +29,19 @@ public class CategorieMontantDTO {
         this.name = name;
     }
 
-    public Double getMontant() {
-        return montant;
+    public Double getMontantAlloue() {
+        return montantAlloue;
     }
 
-    public void setMontant(Double montant) {
-        this.montant = montant;
+    public void setMontantAlloue(Double montantAlloue) {
+        this.montantAlloue = montantAlloue;
+    }
+
+    public Double getMontantRestant() {
+        return montantRestant;
+    }
+
+    public void setMontantRestant(Double montantRestant) {
+        this.montantRestant = montantRestant;
     }
 }

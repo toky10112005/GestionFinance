@@ -4,12 +4,15 @@ import com.gestionbudget.service.BudgetService;
 import com.gestionbudget.model.Budget;
 import com.gestionbudget.model.Client;
 import com.gestionbudget.model.CategorieList;
+import com.gestionbudget.model.Depense;
 import com.gestionbudget.dto.BudgetRequest;
 import com.gestionbudget.dto.BudgetResponse;
 import com.gestionbudget.dto.BudgetEtatResponse;
 import com.gestionbudget.dto.CategorieMontantDTO;
+import com.gestionbudget.dto.DepenseRequest;
 import com.gestionbudget.service.ClientService;
 import com.gestionbudget.service.CategorieListService;
+import com.gestionbudget.service.DepenseService;
 import com.gestionbudget.dto.BCategorie;
 import com.gestionbudget.model.BudgetCategorie;
 import com.gestionbudget.service.BudgetCategorieService;
@@ -30,18 +33,20 @@ public class BudgetController {
     private final ClientService clientService;
     private final CategorieListService categorieListService;
     private final BudgetCategorieService budgetCategorieService;
+    private final DepenseService depenseService;
 
-    public BudgetController(BudgetService budgetService, ClientService clientService, CategorieListService categorieListService, BudgetCategorieService budgetCategorieService) {
+    public BudgetController(BudgetService budgetService, ClientService clientService, CategorieListService categorieListService, BudgetCategorieService budgetCategorieService, DepenseService depenseService) {
         this.budgetService = budgetService;
         this.clientService = clientService;
         this.categorieListService = categorieListService;
         this.budgetCategorieService = budgetCategorieService;
+        this.depenseService = depenseService;
     }
 
     // Nouvel endpoint : renvoie l'état RÉEL du budget d'un utilisateur, tel qu'enregistré en base.
-    // C'est ce que Home.tsx doit appeler au montage, à la place de localStorage,
-    // pour que la liste des catégories et le budget total s'affichent correctement
-    // dès la connexion, quel que soit l'état du navigateur (déconnexion, autre appareil, etc.).
+    // Pour chaque catégorie, on distingue désormais :
+    //  - montantAlloue : ce que l'utilisateur a budgété (ne change jamais à cause d'une dépense)
+    //  - montantRestant : montantAlloue - somme des dépenses déjà enregistrées pour cette catégorie
     @GetMapping("/{userId}")
     public ResponseEntity<?> getBudgetEtat(@PathVariable Long userId) {
         Budget budget = budgetService.findByClientId(userId);
@@ -49,30 +54,33 @@ public class BudgetController {
 
         if (budget == null) {
             // Aucun budget créé pour l'instant : on renvoie quand même la liste
-            // des catégories (montant à 0 partout) pour que le front sache
+            // des catégories (montants à 0 partout) pour que le front sache
             // qu'il existe des catégories, sans budget total défini.
             List<CategorieMontantDTO> categoriesVides = categoriesList.stream()
-                    .map(cat -> new CategorieMontantDTO(cat.getId(), cat.getName(), 0.0))
+                    .map(cat -> new CategorieMontantDTO(cat.getId(), cat.getName(), 0.0, 0.0))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(new BudgetEtatResponse(0.0, categoriesVides));
         }
 
         List<BudgetCategorie> budgetCategories = budgetCategorieService.getByBudgetId(budget.getId());
 
-        // Table de correspondance catégorieId -> montant déjà enregistré
-        Map<Long, Double> montantParCategorieId = budgetCategories.stream()
+        // Table de correspondance catégorieId -> BudgetCategorie (pour retrouver
+        // à la fois le montant alloué et l'id nécessaire au calcul des dépenses).
+        Map<Long, BudgetCategorie> budgetCategorieParCategorieId = budgetCategories.stream()
                 .collect(Collectors.toMap(
                         bc -> bc.getCategorieList().getId(),
-                        BudgetCategorie::getMontant,
+                        bc -> bc,
                         (ancien, nouveau) -> nouveau
                 ));
 
         List<CategorieMontantDTO> categoriesDTO = categoriesList.stream()
-                .map(cat -> new CategorieMontantDTO(
-                        cat.getId(),
-                        cat.getName(),
-                        montantParCategorieId.getOrDefault(cat.getId(), 0.0)
-                ))
+                .map(cat -> {
+                    BudgetCategorie bc = budgetCategorieParCategorieId.get(cat.getId());
+                    Double montantAlloue = bc != null ? bc.getMontant() : 0.0;
+                    Double totalDepenses = bc != null ? depenseService.getTotalDepensesPourCategorie(bc.getId()) : 0.0;
+                    Double montantRestant = montantAlloue - totalDepenses;
+                    return new CategorieMontantDTO(cat.getId(), cat.getName(), montantAlloue, montantRestant);
+                })
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new BudgetEtatResponse(budget.getMontantTotal(), categoriesDTO));
@@ -128,6 +136,39 @@ public class BudgetController {
             }
 
         }
+        return ResponseEntity.ok(true);
+    }
+
+    @PostMapping ("/depense")
+    public ResponseEntity<?> saveDepense(@RequestBody DepenseRequest depenseRequest) {
+        Budget budget = budgetService.findByClientId(depenseRequest.getUserId());
+        if (budget == null) {
+            return ResponseEntity.badRequest().body("Budget not found for userId: " + depenseRequest.getUserId());
+        }
+
+        BudgetCategorie budgetCategorie = budgetCategorieService.findByBudgetIdCategorieId(budget.getId(), depenseRequest.getCategorieId());
+        if (budgetCategorie == null) {
+            return ResponseEntity.badRequest().body("BudgetCategorie not found for budgetId: " + budget.getId() + " and categorieId: " + depenseRequest.getCategorieId());
+        }
+
+        double montantDepense = depenseRequest.getMontant();
+        double montantAlloue = budgetCategorie.getMontant();
+        double totalDepensesExistantes = depenseService.getTotalDepensesPourCategorie(budgetCategorie.getId());
+        double montantRestant = montantAlloue - totalDepensesExistantes;
+
+        if (montantDepense > montantRestant) {
+            return ResponseEntity.badRequest().body("Insufficient budget for this category. Montant restant: " + montantRestant);
+        }
+
+        // On ne modifie plus BudgetCategorie.montant : il reste l'allocation
+        // d'origine, décidée par l'utilisateur. Seule la table "depense" garde
+        // la trace des dépenses ; le montant restant est recalculé à la volée
+        // (voir getBudgetEtat) en soustrayant la somme des dépenses de l'alloué.
+        Depense depense = new Depense();
+        depense.setBudgetCategorie(budgetCategorie);
+        depense.setMontant(montantDepense);
+        depenseService.saveDepense(depense);
+
         return ResponseEntity.ok(true);
     }
 }
