@@ -2,9 +2,7 @@ package com.gestionbudget.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
 
-// import javax.annotation.processing.Generated;
 
 @Table(name ="client")
 @Entity
@@ -18,7 +16,7 @@ public class Client {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "email", unique = true, nullable = false)
@@ -27,9 +25,7 @@ public class Client {
     @Column(name = "role", nullable = false)
     private String role;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime created_at;
-
-    @Column (name = "updated_at", nullable = false)
-    private LocalDateTime updated_at;
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
