@@ -10,6 +10,7 @@ import com.gestionbudget.dto.BudgetResponse;
 import com.gestionbudget.dto.BudgetEtatResponse;
 import com.gestionbudget.dto.CategorieMontantDTO;
 import com.gestionbudget.dto.DepenseRequest;
+import com.gestionbudget.dto.DepenseHistoriqueResponse;
 import com.gestionbudget.service.ClientService;
 import com.gestionbudget.service.CategorieListService;
 import com.gestionbudget.service.DepenseService;
@@ -170,5 +171,31 @@ public class BudgetController {
         depenseService.saveDepense(depense);
 
         return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/depenses/{userID}/{idCategorie}")
+    public ResponseEntity<?> getDepenses(@PathVariable Long userID, @PathVariable Long idCategorie) {
+        Budget budget = budgetService.findByClientId(userID);
+        if (budget == null) {
+            return ResponseEntity.badRequest().body("Budget not found for userId: " + userID);
+        }
+
+        BudgetCategorie budgetCategorie = budgetCategorieService.findByBudgetIdCategorieId(budget.getId(), idCategorie);
+        if (budgetCategorie == null) {
+            return ResponseEntity.badRequest().body("BudgetCategorie not found for budgetId: " + budget.getId() + " and categorieId: " + idCategorie);
+        }
+
+        List<DepenseHistoriqueResponse> historique = depenseService
+                .findByBudgetCategorieId(budgetCategorie.getId())
+                .stream()
+                .map(depense -> new DepenseHistoriqueResponse(
+                        budgetCategorie.getCategorieList().getName(),
+                        budgetCategorie.getMontant(),
+                        depense.getMontant(),
+                        depense.getCreatedAt()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(historique);
     }
 }

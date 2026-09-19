@@ -3,6 +3,7 @@ package com.gestionbudget.model;
 
 import lombok.*;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Table(name="depense")
 @Entity 
@@ -19,5 +20,13 @@ public class Depense {
 
     @Column(name = "montant", nullable = false)
     private Double montant;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
     
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect, type FormEvent } from "react";
 import { verifierBudgetSuffisant } from ".././services/PetiteFonctionnalite";
+import { Link } from "react-router-dom";
 
 function soummetreBudget(
     budgetTotal: number, 
@@ -296,16 +297,24 @@ export default function Home() {
                                 />
 
                                 {budgetcategorie[index] !== 0 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setMontantDepense(0);
-                                            setPopupCategorieIndex(index);
-                                        }}
-                                        className="mt-1 text-xs text-amber-400 hover:text-amber-300 underline"
-                                    >
-                                        + Ajouter une dépense
-                                    </button>
+                                    <div className="flex items-center gap-4 mt-1">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setMontantDepense(0);
+                                                setPopupCategorieIndex(index);
+                                            }}
+                                            className="text-xs text-amber-400 hover:text-amber-300 underline"
+                                        >
+                                            + Ajouter une dépense
+                                        </button>
+                                        <Link
+                                            to={`/historique-depenses/${categorie.id}`}
+                                            className="text-xs text-amber-400 hover:text-amber-300 underline"
+                                        >
+                                            Voir l'historique
+                                        </Link>
+                                    </div>
                                 )}
                             </div>
                         ))}
